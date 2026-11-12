@@ -1,0 +1,4 @@
+- insert:
+    - id: local-session-manager
+      name: '@local/dsh-session-manager'
+      config: {}

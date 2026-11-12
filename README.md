@@ -48,23 +48,11 @@
 - 最终缓存写回被跟踪并等待；已删除 ID 的迟到缓存写回受到抑制。不要在同一进程中手工复用已经删除的会话 ID，应使用新 ID 或重启后再创建。
 - 目前文件删除只适配 `session-persistence-jsonl` 后端。未知文件、链接、移动的存储位置和未选中的下级会话均会阻止操作。POSIX 保留空的写锁目录以维护 inode 锁。
 
-## 源文件
-
-源码以本地链接安装到 desktop 配置，更新影响该配置的全部会话，重启后保留。请保留整个[项目目录](<D:/杂务/dsh-session-manager>)。
-
-- [index.js](<D:/杂务/dsh-session-manager/index.js>)：Host API、浏览器认证、工具注册、版本与进度接口。
-- [manager.js](<D:/杂务/dsh-session-manager/manager.js>)：名单、确认计划、停止前后校验、写锁、逐文件删除和索引处理。
-- [runtime-lifecycle.js](<D:/杂务/dsh-session-manager/runtime-lifecycle.js>)：版本绑定的释放能力、停止等待、创建防护和缓存写回边界。
-- [client.js](<D:/杂务/dsh-session-manager/client.js>)：左侧入口、搜索与多选、活动预览、确认弹窗、阶段进度和版本检查。
-- [cache-artifacts.js](<D:/杂务/dsh-session-manager/cache-artifacts.js>)：缓存后端绑定、备份和暂存文件清理、路径与残留核查。
-- [manager.test.mjs](<D:/杂务/dsh-session-manager/tests/manager.test.mjs>)、[runtime-lifecycle.test.mjs](<D:/杂务/dsh-session-manager/tests/runtime-lifecycle.test.mjs>)、[cache-artifacts.test.mjs](<D:/杂务/dsh-session-manager/tests/cache-artifacts.test.mjs>)和[client.test.mjs](<D:/杂务/dsh-session-manager/tests/client.test.mjs>)：隔离回归测试。
-- [runtime-result.json](<D:/杂务/dsh-session-manager/verification/runtime-result.json>)：此前 Host 验证记录，保留供对照。
-
 ## 验证记录
 
 - 66 项回归测试通过，包括 Host 安全逻辑、缓存物理残留、客户端交互逻辑。只操作测试目录的随机自建子目录和自建进程，不接触既有会话。
 - 覆盖确认权限、混合批次、版本和文件变化、写锁争用、下级依赖、最终写回、缓存屏障丢失、超时后已脱离名单但仍在收尾的会话、隐藏工作区关联、非空锁文件、索引重试、双击提交、预览失效和 HTTP 请求边界。
-- 通过安装包中的真实 JSONL 后端及 JSON storage/domain 实现，验证自建会话写锁释放、日志删除、正常缓存、无效记录备份和暂存删除文件清理。核查了真实 Agent 工厂指纹。未选中的自建对照会话保持不变，随后清理所有自建数据，结果见[最终后端验证记录](<D:/杂务/dsh-session-manager/verification/runtime-integration-1.2.0-final.json>)。
+- 通过安装包中的真实 JSONL 后端及 JSON storage/domain 实现，验证自建会话写锁释放、日志删除、正常缓存、无效记录备份和暂存删除文件清理。核查了真实 Agent 工厂指纹。未选中的自建对照会话保持不变，随后清理所有自建数据，
 - 停止路径测试启动了两个自建 Node 进程，仅停止并等待选中 owner 的进程，对照进程保持运行，最后清理。此测试使用模拟 Agent 和 job service，不等同于真实模型任务压力测试。
 - 本轮没有安装临时 Host 插件，没有修改 profile 配置、安装依赖、重启 DSH、停止或删除既有用户会话。此前记录保留供对照。
 - 客户端测试使用 VM 和模拟 React hooks，无浏览器控制。未验证视觉、焦点、真实鼠标点击、付费模型请求或外部 subagent provider 的运行压力。当前 GUI 已核查仍加载旧 Host，新代码需要用户重启后在原界面验收。
@@ -72,9 +60,9 @@
 使用本机已有 Node 执行以下命令，无需安装依赖。
 
 ```powershell
-& 'C:\Users\GG\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe' --test tests/manager.test.mjs tests/runtime-lifecycle.test.mjs tests/cache-artifacts.test.mjs tests/client.test.mjs
+& 'C:\Users\用户名\.dsh\dsh-runtimes\dsh-primary-runtime\dependencies\node\bin\node.exe' --test tests/manager.test.mjs tests/runtime-lifecycle.test.mjs tests/cache-artifacts.test.mjs tests/client.test.mjs
 ```
 
 ## 停用与卸载
 
-通过 DSH 插件管理页面关闭会话管理插件，或移除 `@local/dsh-session-manager`。卸载不删除会话，但会等待本插件已开始的操作收尾。确认卸载后可自行移除[源码目录](<D:/杂务/dsh-session-manager>)。不要在仍链接安装时删除或移动源码。
+通过 DSH 插件管理页面关闭会话管理插件，或移除 `@local/dsh-session-manager`。卸载不删除会话，但会等待本插件已开始的操作收尾。确认卸载后可自行移除。
